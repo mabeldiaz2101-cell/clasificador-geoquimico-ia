@@ -1,0 +1,91 @@
+import streamlit as st
+import pandas as pd
+import joblib
+import json
+import zipfile
+
+# =========================================
+# DESCOMPRIMIR MODELO
+# =========================================
+
+with zipfile.ZipFile(
+    "modelo_geoquimico_random_forest.zip",
+    "r"
+) as zip_ref:
+    
+    zip_ref.extractall()
+
+# =========================================
+# CARGAR MODELO
+# =========================================
+
+modelo = joblib.load(
+    "modelo_geoquimico_random_forest.pkl"
+)
+
+# =========================================
+# CARGAR VARIABLES
+# =========================================
+
+with open(
+    "variables_modelo.json",
+    "r"
+) as f:
+    
+    variables = json.load(f)
+
+# =========================================
+# TITULO
+# =========================================
+
+st.title(
+    "Clasificador geoquímico de rocas"
+)
+
+st.write(
+    "IA entrenada con Random Forest y datos geoquímicos USGS."
+)
+
+# =========================================
+# ENTRADAS
+# =========================================
+
+datos = {}
+
+for var in variables:
+    
+    datos[var] = st.number_input(
+        var,
+        value=0.0
+    )
+
+# =========================================
+# PREDICCION
+# =========================================
+
+if st.button("Clasificar muestra"):
+    
+    muestra = pd.DataFrame([datos])
+    
+    prediccion = modelo.predict(
+        muestra
+    )[0]
+    
+    probabilidades = modelo.predict_proba(
+        muestra
+    )[0]
+
+    st.subheader("Predicción")
+
+    st.write(prediccion)
+
+    df_probs = pd.DataFrame({
+        
+        "Clase": modelo.classes_,
+        
+        "Probabilidad": probabilidades
+    })
+
+    st.subheader("Probabilidades")
+
+    st.dataframe(df_probs)
