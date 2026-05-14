@@ -7,6 +7,27 @@ import json
 # CARGAR MODELO
 # =========================================
 
+# =========================================
+# DESCOMPRIMIR MODELO
+# =========================================
+# Como GitHub no permitió subir el modelo .pkl directamente,
+# subimos el modelo comprimido como ZIP.
+# Este bloque descomprime el ZIP para recuperar el archivo .pkl.
+
+import zipfile
+
+with zipfile.ZipFile(
+    "modelo_geoquimico_random_forest.zip",
+    "r"
+) as zip_ref:
+    
+    zip_ref.extractall()
+
+# =========================================
+# CARGAR MODELO ENTRENADO
+# =========================================
+# Una vez descomprimido, cargamos el modelo Random Forest entrenado.
+
 modelo = joblib.load(
     "modelo_geoquimico_random_forest.pkl"
 )
